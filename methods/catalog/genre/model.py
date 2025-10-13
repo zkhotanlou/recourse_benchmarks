@@ -162,9 +162,9 @@ class GenRe(RecourseMethod):
             )
         
         # Load checkpoint
-        checkpoint = torch.load(full_path, map_location='cpu')
+        # checkpoint = torch.load(full_path, map_location='cpu')
         # for newer PyTorch versions, use:
-        # checkpoint = torch.load(full_path, map_location='cpu', weights_only=False)
+        checkpoint = torch.load(full_path, map_location='cpu', weights_only=False)
         
 
         # Initialize model
