@@ -127,10 +127,7 @@ class GenRe(RecourseMethod):
         self._transformer = self._load_transformer(self._params["model_path"])
         
         # Store device
-        self._device = torch.device(
-            "mps" if torch.backends.mps.is_available()
-            else ("cuda" if torch.cuda.is_available() else "cpu")
-        )
+        self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._transformer = self._transformer.to(self._device)
         self._transformer.eval()
 
