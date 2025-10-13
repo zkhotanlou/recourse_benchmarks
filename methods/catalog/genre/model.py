@@ -162,12 +162,10 @@ class GenRe(RecourseMethod):
             )
         
         # Load checkpoint
-        try:
-            # Try new PyTorch (>= 1.13)
-            heckpoint = torch.load(full_path, map_location='cpu', weights_only=False)
-        except TypeError:
-            # Fall back for old PyTorch (< 1.13)
-            checkpoint = torch.load(full_path, map_location='cpu')
+        checkpoint = torch.load(full_path, map_location='cpu')
+        # for newer PyTorch versions, use:
+        # checkpoint = torch.load(full_path, map_location='cpu', weights_only=False)
+        
 
         # Initialize model
         model = GenReTransformer(
