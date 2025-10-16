@@ -167,7 +167,6 @@ def initialize_recourse_method(
         return Revise(mlmodel, data, hyperparams)
     elif "wachter" in method:
         return Wachter(mlmodel, hyperparams)
-    
     else:
         raise ValueError("Recourse method not known")
 

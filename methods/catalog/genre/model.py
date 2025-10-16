@@ -127,12 +127,10 @@ class GenRe(RecourseMethod):
         self._transformer = self._load_transformer(self._params["model_path"])
         
         # Store device
-        self._device = torch.device(
-            "mps" if torch.backends.mps.is_available()
-            else ("cuda" if torch.cuda.is_available() else "cpu")
-        )
+        self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._transformer = self._transformer.to(self._device)
         self._transformer.eval()
+
     
     def _load_transformer(self, model_path: str) -> GenReTransformer:
         """
@@ -162,11 +160,10 @@ class GenRe(RecourseMethod):
             )
         
         # Load checkpoint
-        # checkpoint = torch.load(full_path, map_location='cpu')
+        checkpoint = torch.load(full_path, map_location='cpu')
         # for newer PyTorch versions, use:
-        checkpoint = torch.load(full_path, map_location='cpu', weights_only=False)
+        # checkpoint = torch.load(full_path, map_location='cpu', weights_only=False)
         
-
         # Initialize model
         model = GenReTransformer(
             n_features=checkpoint['n_features'],
@@ -179,8 +176,16 @@ class GenRe(RecourseMethod):
             n_bins=checkpoint['n_bins']
         )
         
-        model.load_state_dict(checkpoint['model_state_dict'])
-        
+        # Load state dict with dimension conversion
+        state_dict = checkpoint['model_state_dict']
+    
+        # Convert pos_encoder.pe from (1, seq, d_model) to (seq, 1, d_model)
+        if 'pos_encoder.pe' in state_dict:
+            pe = state_dict['pos_encoder.pe']  # (1, 100, 32)
+            state_dict['pos_encoder.pe'] = pe.transpose(0, 1)  # (100, 1, 32)
+    
+        model.load_state_dict(state_dict)
+    
         return model
     
     def get_counterfactuals(self, factuals: pd.DataFrame) -> pd.DataFrame:
@@ -291,6 +296,10 @@ class GenRe(RecourseMethod):
         Returns:
             Best candidate (n_features,)
         """
+        # Ensure model is in eval mode
+        if hasattr(self._mlmodel.raw_model, 'eval'):
+            self._mlmodel.raw_model.eval()
+            
         # Convert to DataFrame for classifier
         candidates_df = pd.DataFrame(
             candidates,
