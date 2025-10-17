@@ -147,6 +147,9 @@ def initialize_recourse_method(
         return FeatureTweak(mlmodel)
     elif method == "focus":
         return FOCUS(mlmodel)
+    elif method == "genre":
+        hyperparams["data_name"] = data_name
+        return GenRe(mlmodel, hyperparams)
     elif method == "gravitational":
         return Gravitational(mlmodel, hyperparams)
     elif method == "greedy":
@@ -275,6 +278,7 @@ def create_parser():
             "face_epsilon",
             "feature_tweak",
             "focus",
+            "genre",
             "gravitational",
             "greedy",
             "gs",
